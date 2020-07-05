@@ -4,11 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class ListSelectionRecyclerViewAdapter : RecyclerView.Adapter<ListSelectionViewHolder>() {
-
-    //Array of strings to use as the list titles.
-    val listTitles = arrayListOf("Shopping", "Chore", "Android Tuitorials")
-
+class ListSelectionRecyclerViewAdapter(private val lists : ArrayList<TaskList>) :
+      RecyclerView.Adapter<ListSelectionViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListSelectionViewHolder {
 
@@ -19,7 +16,7 @@ class ListSelectionRecyclerViewAdapter : RecyclerView.Adapter<ListSelectionViewH
          * Always use false for RecyclerView layouts as the RecyclerView attaches and detaches the Views for you.*/
 
         val view = LayoutInflater.from(parent.context)
-                           .inflate(R.layout.list_selection_view_holder, parent, false)
+            .inflate(R.layout.list_selection_view_holder, parent, false)
 
         // return the viewHolder that was created passing in the view
         return ListSelectionViewHolder(view)
@@ -30,18 +27,21 @@ class ListSelectionRecyclerViewAdapter : RecyclerView.Adapter<ListSelectionViewH
     override fun getItemCount(): Int {
 
          //size of the array should match the size of the RecyclerView
-         return listTitles.size
+         return lists.size
     }
 
     override fun onBindViewHolder(holder: ListSelectionViewHolder, position: Int) {
 
         //set a value for each of the TextViews on the ViewHolder
         holder.listPosition.text = (position + 1).toString()
-        holder.listtitle.text = listTitles[position]
+        holder.listTitle.text = lists.get(position).name
 
-        /**For each call of onBindViewHolder(), you take the TextViews you created in the ViewHolder
-         *  and populate them with their position in the list and
-         *  the name of the list from the listTitles array.*/
     }
 
+    fun addList(list: TaskList) {
+        // Update the ArrayList with the new TaskList.
+        lists.add(list)
+
+        // Call notifyItemInserted() to inform the Adapter that you updated the data source, and you update the RecyclerView.
+        notifyItemInserted(lists.size-1) }
 }

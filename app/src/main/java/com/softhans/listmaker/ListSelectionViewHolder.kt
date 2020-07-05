@@ -9,5 +9,5 @@ class ListSelectionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView
 
     //References to the TextViews
     val listPosition = itemView.itemNumber as TextView
-    val listtitle = itemView.itemString as TextView
+    val listTitle = itemView.itemString as TextView
 }

@@ -2,8 +2,6 @@ package com.softhans.listmaker
 
 import android.os.Bundle
 import android.text.InputType
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -11,31 +9,42 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity() {
+
+    val listDataManager: ListDataManager = ListDataManager(this)
+    //initialize a property to hold the ListDataManager: This creates a new ListDataManager as soon as the Activity is created.
+
+    lateinit var listsRecyclerView: RecyclerView
+    //You use the lateinit keyword to tell the compiler that a RecyclerView will be created sometime in the future.
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        //You use the lateinit keyword to tell the compiler that a RecyclerView will be created sometime in the future.
-      lateinit var listRecyclerView: RecyclerView
+        /**Link the RecyclerView in your class to the one in your layout and give it a LayoutManager and Adapter.*/
 
-     //Link the RecyclerView in your class to the one in your layout and give it a LayoutManager and Adapter.
+        //list of TaskLists from listDataManager, ready for use.
+        val lists = listDataManager.readLists()
 
         //Let the RecyclerView know what kind of Layout to present your items in.
+        listsRecyclerView = findViewById<RecyclerView>(R.id.lists_recyclerview)
         lists_recyclerview.layoutManager = LinearLayoutManager(this)
 
+        listsRecyclerView.adapter = ListSelectionRecyclerViewAdapter(lists)
 
-        lists_recyclerview.adapter = ListSelectionRecyclerViewAdapter()
 
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-            showCreateListDialog()
-        }
+       fab.setOnClickListener {
+
+           showCreateListDialog()
+
+       }
+
+
+
     }
 
     private fun showCreateListDialog() {
@@ -43,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         //Retrieve the strings defined in strings.xml for use in the Dialog
         val dialogTitle = getString(R.string.name_of_list)
         val positiveButtonTitle = getString(R.string.create_list)
+
 
         //Create an AlertDialog.Builder to help construct the Dialog.
         val builder = AlertDialog.Builder(this)
@@ -60,16 +70,22 @@ class MainActivity : AppCompatActivity() {
         builder.setView(listTitleEditText)
 
         //Add a positive button to the Dialog; telling the Dialog a positive action has occurred and something should happen.
-        builder.setPositiveButton(positiveButtonTitle){ dialog, _ ->
-            dialog.dismiss()
+        builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
 
+            //add create a list and save it to the ListDataManager:
+            val list = TaskList(listTitleEditText.text.toString())
+            listDataManager.saveList(list)
+
+            val recyclerAdapter = listsRecyclerView.adapter as ListSelectionRecyclerViewAdapter
+                recyclerAdapter.addList(list)
+
+            dialog.dismiss()
+        }
         //Instruct the Dialog Builder to create the Dialog and display it on the screen.
             builder.create().show()
-        }
-
-
 
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -86,6 +102,8 @@ class MainActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+
 }
 
 
