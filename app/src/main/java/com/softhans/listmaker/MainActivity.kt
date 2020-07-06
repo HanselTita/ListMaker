@@ -1,5 +1,6 @@
 package com.softhans.listmaker
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import androidx.appcompat.app.AppCompatActivity
@@ -80,6 +81,7 @@ class MainActivity : AppCompatActivity() {
                 recyclerAdapter.addList(list)
 
             dialog.dismiss()
+            showListDetail(list)
         }
         //Instruct the Dialog Builder to create the Dialog and display it on the screen.
             builder.create().show()
@@ -101,7 +103,16 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+
     }
+    private fun showListDetail(list: TaskList) {
+
+        val listDetailIntent = Intent(this, ListDetailActivity::class.java)
+        listDetailIntent.putExtra(INTENT_LIST_KEY, list)
+        startActivity(listDetailIntent)
+    }
+
+    companion object { const val INTENT_LIST_KEY = "list" }
 
 
 }
