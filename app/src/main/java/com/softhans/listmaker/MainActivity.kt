@@ -1,5 +1,6 @@
 package com.softhans.listmaker
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
@@ -107,17 +108,39 @@ class MainActivity : AppCompatActivity(),
 
     }
     private fun showListDetail(list: TaskList) {
-
         val listDetailIntent = Intent(this, ListDetailActivity::class.java)
         listDetailIntent.putExtra(INTENT_LIST_KEY, list)
-        startActivity(listDetailIntent)
+        startActivityForResult(listDetailIntent, LIST_DETAIL_REQUEST_CODE)
     }
 
     override fun listItemClicked(list: TaskList) {
         showListDetail(list)
     }
-    companion object { const val INTENT_LIST_KEY = "list" }
+    companion object {
+        const val INTENT_LIST_KEY = "list"
+        const val LIST_DETAIL_REQUEST_CODE = 123
+    }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+            //Check the request code is the same code you’re expecting to get back.
+        if (requestCode == LIST_DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+
+            //Unwrap the data Intent passed in.
+            data?.let {
+
+           //Save the list to the list data manager and then call updateLists()
+             listDataManager.saveList(data.getParcelableExtra(INTENT_LIST_KEY ) as TaskList)
+                updateLists()
+            }
+        }
+    }
+
+    private fun updateLists() {
+        val lists = listDataManager.readLists()
+        listsRecyclerView.adapter = ListSelectionRecyclerViewAdapter(lists, this)
+    }
 
 }
 
